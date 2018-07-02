@@ -14,19 +14,22 @@ namespace bakeChart.Charting
         static void Main(string[] args)
         {
             var dictionary = ReadDataFromFiles(@"c:\git\bakeChart\bakeChart\bin\Debug\outs");
+            var max = dictionary.Values.Select(x => x.Count).Max();
+            var competitorWithMaxEntires = dictionary.Keys.First(key => dictionary[key].Count == max);
+            var howManyPointShouldStay = 50;
+            var takeEveryNthPoint = max / howManyPointShouldStay;
+            Console.WriteLine(max);
+            Console.WriteLine(takeEveryNthPoint);
             var dictionaryKeys = dictionary.Keys.ToArray();
             foreach (var key in dictionaryKeys)
             {
                 //take every 4th entry
                 int c = 0;
-                dictionary[key] = dictionary[key].Where(x => c++ % 4 == 0).ToList().Take(100).ToList();
+                dictionary[key] = dictionary[key].Where(x => c++ % howManyPointShouldStay == 0).ToList().ToList();
             }
 
-            var labels = dictionary
-                .AsEnumerable()
-                .First()
-                .Value
-                .Select(x => "'" + x.DateTime.ToString("O") + "'")
+            var labels = dictionary[competitorWithMaxEntires]
+                .Select(x => "'" + x.DateTime.ToLocalTime().ToString("dd MMM  HH:mm") + "'")
                 .Aggregate((a,b) => a + "," + b);
 
             var allDataSetsJoined = dictionary.Select(x => DatasetForCompetitor(x.Key, x.Value)).Aggregate((a, b) => a + "\n" + b);
