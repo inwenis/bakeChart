@@ -25,7 +25,7 @@ namespace bakeChart.Charting
             {
                 //take every 4th entry
                 int c = 0;
-                dictionary[key] = dictionary[key].Where(x => c++ % howManyPointShouldStay == 0).ToList().ToList();
+                dictionary[key] = dictionary[key].Where(x => c++ % takeEveryNthPoint == 0).ToList().ToList();
             }
 
             var labels = dictionary[competitorWithMaxEntires]
