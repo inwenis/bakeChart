@@ -19,7 +19,7 @@ namespace bakeChart.Charting
             {
                 //take every 4th entry
                 int c = 0;
-                dictionary[key] = dictionary[key].Where(x => c++ % 4 == 0).ToList();
+                dictionary[key] = dictionary[key].Where(x => c++ % 4 == 0).ToList().Take(100).ToList();
             }
 
             var labels = dictionary
@@ -40,6 +40,7 @@ namespace bakeChart.Charting
         private static string DatasetForCompetitor(string name, List<Point> points)
         {
             var data = points
+                .OrderBy(x => x.DateTime)
                 .Select(p => p.Value.ToString())
                 .Aggregate((a, b) => a + "," + b);
 
@@ -67,7 +68,7 @@ namespace bakeChart.Charting
             foreach (var file in files)
             {
                 var dateTimeFromFileName = DateTimeOffset.ParseExact(Path.GetFileNameWithoutExtension(file),
-                    "yyyy-MM-ddThh-mm-ss", new DateTimeFormatInfo());
+                    "yyyy-MM-ddTHH-mm-ss", new DateTimeFormatInfo());
                 var lines = File.ReadAllLines(file);
                 foreach (var line in lines)
                 {
