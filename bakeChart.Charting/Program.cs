@@ -143,8 +143,11 @@ namespace bakeChart.Charting
             var files = Directory.GetFiles(pathToDirectoryWithFiles, "*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
-                var dateTimeFromFileName = DateTimeOffset.ParseExact(Path.GetFileNameWithoutExtension(file),
-                    "yyyy-MM-ddTHH-mm-ss", new DateTimeFormatInfo());
+                var dateTimeFromFileName = DateTimeOffset.ParseExact(
+                    Path.GetFileNameWithoutExtension(file),
+                    "yyyy-MM-ddTHH-mm-ss",
+                    new DateTimeFormatInfo(),
+                    DateTimeStyles.AssumeUniversal);
                 var lines = File.ReadAllLines(file, Encoding.UTF8);
                 foreach (var line in lines)
                 {
