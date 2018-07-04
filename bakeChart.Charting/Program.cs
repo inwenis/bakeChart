@@ -46,7 +46,13 @@ namespace bakeChart.Charting
             {
                 //take every 4th entry
                 int c = 0;
-                dictionary[key] = dictionary[key].Where(x => c++ % takeEveryNthPoint == 0).ToList();
+                var allPoints = dictionary[key];
+                var pointsToPlotOnChart = allPoints.Where(x => c++ % takeEveryNthPoint == 0).ToList();
+                if (!pointsToPlotOnChart.Contains(allPoints.Last()))
+                {
+                    pointsToPlotOnChart.Add(allPoints.Last());
+                }
+                dictionary[key] = pointsToPlotOnChart;
             }
 
             var labels = dictionary[tortowyZascianekKey]
