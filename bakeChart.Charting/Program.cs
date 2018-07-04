@@ -24,13 +24,18 @@ namespace bakeChart.Charting
         {
             Console.WriteLine(DateTimeOffset.UtcNow + " will not refresh chart");
             var dictionary = ReadDataFromFiles(@"c:\git\bakeChart\bakeChart\bin\Debug\outs");
-            var dictionaryKeys = dictionary.Keys.ToArray();
-            var tortowyZascianekKey = dictionaryKeys.First(k => k.Contains("Tortowy"));
+
+            RemoveEntreisWhereAllValuesAreZero(dictionary);
+
+            var tortowyZascianekKey = dictionary.Keys.ToArray().First(k => k.Contains("Tortowy"));
+            AddMissingPoints(dictionary, tortowyZascianekKey);
+
             var max = dictionary[tortowyZascianekKey].Count;
             var howManyPointShouldStay = 50;
             var takeEveryNthPoint = max / howManyPointShouldStay;
             Console.WriteLine(DateTimeOffset.UtcNow + " there are " + max + " point, I will take every " + takeEveryNthPoint + "nth for the chart");
-            foreach (var key in dictionaryKeys)
+
+            foreach (var key in dictionary.Keys.ToArray())
             {
                 //take every 4th entry
                 int c = 0;
@@ -58,6 +63,36 @@ namespace bakeChart.Charting
             }
 
             Console.WriteLine(DateTimeOffset.UtcNow + " done refreshing chart");
+        }
+
+        private static void RemoveEntreisWhereAllValuesAreZero(Dictionary<string, List<Point>> dictionary)
+        {
+            var dictionaryKeys = dictionary.Keys.ToArray();
+            var keysToBeRemoved = dictionaryKeys.Where(x => dictionary[x].All(p => p.Value == 0));
+            foreach (var key in keysToBeRemoved)
+            {
+                dictionary.Remove(key);
+            }
+        }
+
+        private static void AddMissingPoints(Dictionary<string, List<Point>> dictionary, string tortowyZascianekKey)
+        {
+            var goodPoints = dictionary[tortowyZascianekKey];
+            foreach (var keyValuePair in dictionary)
+            {
+                var points = keyValuePair.Value;
+                foreach (var goodPoint in goodPoints)
+                {
+                    if (points.Any(p => p.DateTime == goodPoint.DateTime))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        points.Add(new Point(){DateTime = goodPoint.DateTime, Value = 0});
+                    }
+                }
+            }
         }
 
         private static string DatasetForCompetitor(string name, List<Point> points)
