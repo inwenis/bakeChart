@@ -90,7 +90,7 @@ namespace bakeChart.Charting
         private static Dictionary<string, List<Point>> ReadDataFromFiles(string pathToDirectoryWithFiles)
         {
             var dictionary = new Dictionary<string, List<Point>>();
-            var files = Directory.GetFiles(pathToDirectoryWithFiles);
+            var files = Directory.GetFiles(pathToDirectoryWithFiles, "*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
                 var dateTimeFromFileName = DateTimeOffset.ParseExact(Path.GetFileNameWithoutExtension(file),
