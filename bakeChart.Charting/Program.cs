@@ -115,7 +115,7 @@ namespace bakeChart.Charting
                 .Select(p => p.Value.ToString())
                 .Aggregate((a, b) => a + "," + b);
 
-            var colorNames = new [] {"red","orange","yellow","green","blue","purple","grey"};
+            var colorNames = new [] {"red","orange","yellow","green","blue","grey"};
             var colorName = colorNames[random.Next(colorNames.Length)];
 
             if (name.Contains("Tortowy"))
