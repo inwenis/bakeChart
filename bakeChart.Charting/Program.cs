@@ -15,21 +15,21 @@ namespace bakeChart.Charting
 
         static void Main(string[] args)
         {
-            var timer = new Timer(new TimerCallback(DoIt), null, 0, 10 * 60 * 1000);
+            var timer = new Timer(new TimerCallback(RefreshChart), null, 0, 10 * 60 * 1000);
             Console.WriteLine("Press [enter] to exit");
             Console.ReadLine();
         }
 
-        static void DoIt(object state)
+        static void RefreshChart(object state)
         {
+            Console.WriteLine(DateTimeOffset.UtcNow + " will not refresh chart");
             var dictionary = ReadDataFromFiles(@"c:\git\bakeChart\bakeChart\bin\Debug\outs");
-            var max = dictionary.Values.Select(x => x.Count).Max();
-            var competitorWithMaxEntires = dictionary.Keys.First(key => dictionary[key].Count == max);
+            var dictionaryKeys = dictionary.Keys.ToArray();
+            var tortowyZascianekKey = dictionaryKeys.First(k => k.Contains("Tortowy"));
+            var max = dictionary[tortowyZascianekKey].Count;
             var howManyPointShouldStay = 50;
             var takeEveryNthPoint = max / howManyPointShouldStay;
-            Console.WriteLine(max);
-            Console.WriteLine(takeEveryNthPoint);
-            var dictionaryKeys = dictionary.Keys.ToArray();
+            Console.WriteLine(DateTimeOffset.UtcNow + " there are " + max + " point, I will take every " + takeEveryNthPoint + "nth for the chart");
             foreach (var key in dictionaryKeys)
             {
                 //take every 4th entry
@@ -37,7 +37,7 @@ namespace bakeChart.Charting
                 dictionary[key] = dictionary[key].Where(x => c++ % takeEveryNthPoint == 0).ToList().ToList();
             }
 
-            var labels = dictionary[dictionaryKeys.First(k => k.Contains("Tortowy"))]
+            var labels = dictionary[tortowyZascianekKey]
                 .Select(x => "'" + x.DateTime.ToLocalTime().ToString("dd MMM  HH:mm") + "'")
                 .Aggregate((a,b) => a + "," + b);
 
@@ -52,10 +52,12 @@ namespace bakeChart.Charting
                 File.WriteAllText(@"out.html", replace, Encoding.UTF8);
                 File.WriteAllText(@"C:\inetpub\wwwroot\out.html", replace, Encoding.UTF8);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e);
+                Console.WriteLine("Cout not write to one of the output files");
             }
+
+            Console.WriteLine(DateTimeOffset.UtcNow + " done refreshing chart");
         }
 
         private static string DatasetForCompetitor(string name, List<Point> points)
