@@ -11,35 +11,31 @@ namespace bakeChart
     {
         static void Main(string[] args)
         {
-            Directory.CreateDirectory("outs");
-            var timer = new Timer(new TimerCallback(DoIt), null, 0, 1 * 60 * 1000);
+            var timer = new Timer(new TimerCallback(DownloadAndSaveData), null, 0, 1 * 60 * 1000);
             Console.WriteLine("Press [enter] to exit");
             Console.ReadLine();
         }
 
-        private static void DoIt(object state)
+        private static void DownloadAndSaveData(object state)
         {
             try
             {
-                Console.WriteLine(DateTimeOffset.UtcNow);
+                Console.WriteLine(DateTimeOffset.UtcNow + ": will now download data");
                 var httpClient = new HttpClient();
                 var result = httpClient
                     .GetStringAsync("http://hermes.gratka-technologie.pl/glosowanie/wyniki/66482,37218,id,idg.html").Result;
-                //Console.WriteLine(result);
-                //var path = "//*[@id=\"gtsms_sms-wyniki\"]/ul/li[1]/span[2]/span/span[2]";
-                var path = "//*[@id=\"gtsms_sms-wyniki\"]/ul/li";
-
-                File.WriteAllText("out.txt", result);
+                var xPath = "//*[@id=\"gtsms_sms-wyniki\"]/ul/li";
+                StringReader reader = new StringReader(result);
                 var doc = new HtmlDocument();
-                doc.Load("out.txt");
-                var nodes = doc.DocumentNode.SelectNodes(path);
-                var sb = new StringBuilder();
+                doc.Load(reader);
+                var nodes = doc.DocumentNode.SelectNodes(xPath);
+                var stringBuilder = new StringBuilder();
                 foreach (var node in nodes)
                 {
                     var name = node.SelectNodes("./span[2]/span/span[1]/strong")[0].InnerText;
                     var count = node.SelectNodes("./span[2]/span/span[2]/text()")[0].InnerText;
                     count = count.Trim();
-                    sb.AppendLine(name + "\t" + count);
+                    stringBuilder.AppendLine(name + "\t" + count);
                 }
 
                 var now = DateTimeOffset.UtcNow;
@@ -50,7 +46,9 @@ namespace bakeChart
                     now.Day.ToString("00"),
                     now.Hour.ToString("00"));
                 Directory.CreateDirectory(outputDirecotry);
-                File.WriteAllText(Path.Combine(outputDirecotry, fileName), sb.ToString());
+                var fullFileName = Path.Combine(outputDirecotry, fileName);
+                File.WriteAllText(fullFileName, stringBuilder.ToString());
+                Console.WriteLine(DateTimeOffset.UtcNow + ": data written to: " + fullFileName);
             }
             catch (Exception e)
             {
