@@ -27,7 +27,14 @@ namespace bakeChart.Charting
 
             RemoveEntreisWhereAllValuesAreZero(dictionary);
 
-            var tortowyZascianekKey = dictionary.Keys.ToArray().First(k => k.Contains("Tortowy"));
+            var keys = dictionary.Keys.ToArray();
+
+            foreach (var key in keys)
+            {
+                dictionary[key] = dictionary[key].OrderBy(x => x.DateTime).ToList();
+            }
+
+            var tortowyZascianekKey = keys.First(k => k.Contains("Tortowy"));
             AddMissingPoints(dictionary, tortowyZascianekKey);
 
             var max = dictionary[tortowyZascianekKey].Count;
@@ -35,11 +42,11 @@ namespace bakeChart.Charting
             var takeEveryNthPoint = max / howManyPointShouldStay;
             Console.WriteLine(DateTimeOffset.UtcNow + " there are " + max + " point, I will take every " + takeEveryNthPoint + "nth for the chart");
 
-            foreach (var key in dictionary.Keys.ToArray())
+            foreach (var key in keys)
             {
                 //take every 4th entry
                 int c = 0;
-                dictionary[key] = dictionary[key].Where(x => c++ % takeEveryNthPoint == 0).ToList().ToList();
+                dictionary[key] = dictionary[key].Where(x => c++ % takeEveryNthPoint == 0).ToList();
             }
 
             var labels = dictionary[tortowyZascianekKey]
