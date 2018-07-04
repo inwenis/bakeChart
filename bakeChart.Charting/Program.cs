@@ -56,7 +56,7 @@ namespace bakeChart.Charting
             }
 
             var labels = dictionary[tortowyZascianekKey]
-                .Select(x => "'" + x.DateTime.ToOffset(TimeSpan.FromHours(2)).ToString("dd MMM  HH:mm") + "'")
+                .Select(x => "'" + x.DateTime.ToOffset(TimeSpan.FromHours(2)).ToString("dd MMM  HH:mm", new CultureInfo("pl-PL")) + "'")
                 .Aggregate((a,b) => a + "," + b);
 
             var allDataSetsJoined = dictionary.Select(x => DatasetForCompetitor(x.Key, x.Value)).Aggregate((a, b) => a + "\n" + b);
