@@ -11,7 +11,7 @@ namespace bakeChart
     {
         static void Main(string[] args)
         {
-            var timer = new Timer(new TimerCallback(DownloadAndSaveData), null, 0, 1 * 60 * 1000);
+            var timer = new Timer(new TimerCallback(DownloadAndSaveData), null, 0, 10 * 60 * 1000);
             Console.WriteLine("Press [enter] to exit");
             Console.ReadLine();
         }
