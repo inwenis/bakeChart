@@ -12,7 +12,7 @@ namespace bakeChart
         static void Main(string[] args)
         {
             Directory.CreateDirectory("outs");
-            var timer = new Timer(new TimerCallback(DoIt), null, 0, 10 * 60 * 1000);
+            var timer = new Timer(new TimerCallback(DoIt), null, 0, 1 * 60 * 1000);
             Console.WriteLine("Press [enter] to exit");
             Console.ReadLine();
         }
@@ -42,8 +42,15 @@ namespace bakeChart
                     sb.AppendLine(name + "\t" + count);
                 }
 
-                var fileName = DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH-mm-ss") + ".txt";
-                File.WriteAllText(Path.Combine("outs", fileName), sb.ToString());
+                var now = DateTimeOffset.UtcNow;
+                var fileName = now.ToString("yyyy-MM-ddTHH-mm-ss") + ".txt";
+                var outputDirecotry = Path.Combine("outs",
+                    now.Year.ToString("0000"),
+                    now.Month.ToString("00"),
+                    now.Day.ToString("00"),
+                    now.Hour.ToString("00"));
+                Directory.CreateDirectory(outputDirecotry);
+                File.WriteAllText(Path.Combine(outputDirecotry, fileName), sb.ToString());
             }
             catch (Exception e)
             {
