@@ -4,14 +4,23 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace bakeChart.Charting
 {
     class Program
     {
         static Random random = new Random(((int) DateTimeOffset.UtcNow.Ticks));
-        
+
+
         static void Main(string[] args)
+        {
+            var timer = new Timer(new TimerCallback(DoIt), null, 0, 10 * 60 * 1000);
+            Console.WriteLine("Press [enter] to exit");
+            Console.ReadLine();
+        }
+
+        static void DoIt(object state)
         {
             var dictionary = ReadDataFromFiles(@"c:\git\bakeChart\bakeChart\bin\Debug\outs");
             var max = dictionary.Values.Select(x => x.Count).Max();
@@ -28,7 +37,7 @@ namespace bakeChart.Charting
                 dictionary[key] = dictionary[key].Where(x => c++ % takeEveryNthPoint == 0).ToList().ToList();
             }
 
-            var labels = dictionary[competitorWithMaxEntires]
+            var labels = dictionary[dictionaryKeys.First(k => k.Contains("Tortowy"))]
                 .Select(x => "'" + x.DateTime.ToLocalTime().ToString("dd MMM  HH:mm") + "'")
                 .Aggregate((a,b) => a + "," + b);
 
@@ -37,7 +46,16 @@ namespace bakeChart.Charting
             var replace = allText
                 .Replace("XXXLabelsXXX", labels)
                 .Replace("XXXDataSetsXXX", allDataSetsJoined);
-            File.WriteAllText("out.html", replace);
+
+            try
+            {
+                File.WriteAllText(@"out.html", replace, Encoding.UTF8);
+                File.WriteAllText(@"C:\inetpub\wwwroot\out.html", replace, Encoding.UTF8);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         private static string DatasetForCompetitor(string name, List<Point> points)
@@ -49,10 +67,15 @@ namespace bakeChart.Charting
 
             var colorNames = new [] {"red","orange","yellow","green","blue","purple","grey"};
             var colorName = colorNames[random.Next(colorNames.Length)];
-            
+
+            if (name.Contains("Tortowy"))
+            {
+                colorName = "purple";
+            }
+
             var sb = new StringBuilder();
             sb.AppendLine("{");
-            sb.AppendLine("label: '" + name + "',");
+            sb.AppendLine("label: '" + name.Substring(0,17) + "',");
             sb.AppendLine("backgroundColor: window.chartColors." + colorName + ",");
             sb.AppendLine("borderColor: window.chartColors." + colorName + ",");
             sb.AppendLine("data: [");
@@ -72,7 +95,7 @@ namespace bakeChart.Charting
             {
                 var dateTimeFromFileName = DateTimeOffset.ParseExact(Path.GetFileNameWithoutExtension(file),
                     "yyyy-MM-ddTHH-mm-ss", new DateTimeFormatInfo());
-                var lines = File.ReadAllLines(file);
+                var lines = File.ReadAllLines(file, Encoding.UTF8);
                 foreach (var line in lines)
                 {
                     var splitted = line.Split('\t');
