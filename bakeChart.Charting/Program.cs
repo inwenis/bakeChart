@@ -73,7 +73,7 @@ namespace bakeChart.Charting
         private static void Only50PointsShallRemainForEachCompetitor(Dictionary<string, List<Point>> dictionary, string tortowyZascianekKey)
         {
             var max = dictionary[tortowyZascianekKey].Count;
-            var howManyPointShouldStay = 20;
+            var howManyPointShouldStay = 50;
             var takeEveryNthPoint = max / howManyPointShouldStay;
             Console.WriteLine(DateTimeOffset.UtcNow + " there are " + max + " point, I will take every " + takeEveryNthPoint + "nth for the chart");
 
