@@ -16,20 +16,15 @@ namespace fixEncodingInOutputs
             var files = Directory.GetFiles(outsPath, "*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
-                var content = File.ReadAllText(file);
-                if (content.Contains("Å"))
-                {
-                    var fixedContant = FixConect(content);
-                    File.WriteAllText(file, fixedContant, Encoding.UTF8);
-                }
+                var content = File.ReadAllText(file, Encoding.UTF8);
+                var fixedContant = FixConect(content);
+                File.WriteAllText(file, fixedContant, Encoding.UTF8);
             }
         }
 
         private static string FixConect(string content)
         {
-            var bytes = Encoding.Default.GetBytes(content);
-            var s = Encoding.UTF8.GetString(bytes);
-            return s;
+            return content.Replace("Tortowy Zaścianek, Bojano, ul. Czynu 1000-lecia 8", "Tortowy Zaścianek Bogna Nadolska, Bojano, ul. Czynu 1000-lecia 8");
         }
     }
 }
