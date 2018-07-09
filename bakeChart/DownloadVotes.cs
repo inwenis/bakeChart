@@ -8,7 +8,7 @@ namespace bakeChart
 {
     public class DownloadVotes
     {
-        private static string _url;
+        private string _url;
 
         public DownloadVotes(string url)
         {

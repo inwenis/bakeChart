@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using bakeChart;
 
 namespace testBakeChart
@@ -12,9 +7,15 @@ namespace testBakeChart
     {
         static void Main(string[] args)
         {
-            var contant = File.ReadAllText(@"c:\stuff\Hermes.html");
-            var parsed = DownloadVotes.Parse(contant);
+            var downloadVotes = new DownloadVotes("http://hermes.gratka-technologie.pl/glosowanie/wyniki/66482,37218,id,idg.html");
+            var downloadVotes2 = new DownloadVotes("http://hermes.gratka-technologie.pl/glosowanie/wyniki/66482,37188,id,idg.html");
+
+            var parsed = downloadVotes.DownloadVotes_Parse();
+            var parsed2 = downloadVotes2.DownloadVotes_Parse();
+
             Console.WriteLine(parsed);
+            Console.WriteLine(parsed2);
+
             Console.ReadLine();
         }
     }
