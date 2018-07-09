@@ -22,7 +22,7 @@ namespace bakeChart.Charting
 
         static void RefreshChart(object state)
         {
-            Console.WriteLine(DateTimeOffset.UtcNow + " will not refresh chart");
+            Console.WriteLine(DateTimeOffset.UtcNow + " will now refresh chart");
             var dictionary = ReadDataFromFiles(@"c:\git\bakeChart\bakeChart\bin\Debug\outs");
 
             RemoveEntreisWhereAllValuesAreZero(dictionary);
