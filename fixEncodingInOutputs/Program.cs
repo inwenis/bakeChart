@@ -24,7 +24,7 @@ namespace fixEncodingInOutputs
 
         private static string FixConect(string content)
         {
-            return content.Replace("Tortowy Zaścianek, Bojano, ul. Czynu 1000-lecia 8", "Tortowy Zaścianek Bogna Nadolska, Bojano, ul. Czynu 1000-lecia 8");
+            return content.Replace("\t", "\tMistrzowie Smaku - Cukiernia/Kawiarnia Roku 2018 (powiat wejherowski)\t");
         }
     }
 }
