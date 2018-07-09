@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "migrateOldOutputToNew", "mi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fixEncodingInOutputs", "fixEncodingInOutputs\fixEncodingInOutputs.csproj", "{498034A1-8CD7-480F-B7CA-61775FCB4F17}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testBakeChart", "testBakeChart\testBakeChart.csproj", "{313DB360-2627-4A01-8240-66E046792035}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{498034A1-8CD7-480F-B7CA-61775FCB4F17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{498034A1-8CD7-480F-B7CA-61775FCB4F17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{498034A1-8CD7-480F-B7CA-61775FCB4F17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{313DB360-2627-4A01-8240-66E046792035}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{313DB360-2627-4A01-8240-66E046792035}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{313DB360-2627-4A01-8240-66E046792035}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{313DB360-2627-4A01-8240-66E046792035}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
