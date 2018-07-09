@@ -74,6 +74,7 @@ namespace bakeChart.Charting
                 .Where(x => bestCompetitorsFromAreas.Contains(x.Key))
                 .ToDictionary(x => x.Key, x => x.ToList());
 
+            UseOnlyPointsNewerThan(bestOfAllDic, new DateTimeOffset(2018, 07, 09, 15, 0, 0, TimeSpan.Zero));
             AddMissingPoints(bestOfAllDic, tortowyZascianekKey);
             OrderPointsByDateTime(bestOfAllDic);
             Only50PointsShallRemainForEachCompetitor(bestOfAllDic, tortowyZascianekKey);
@@ -85,11 +86,22 @@ namespace bakeChart.Charting
             }
         }
 
+        private static void UseOnlyPointsNewerThan(Dictionary<string, List<Point>> bestOfAllDic, DateTimeOffset threshold)
+        {
+            foreach (var key in bestOfAllDic.Keys.ToArray())
+            {
+                bestOfAllDic[key] = bestOfAllDic[key].Where(x => x.DateTime > threshold).ToList();
+            }
+        }
+
         private static void Only50PointsShallRemainForEachCompetitor(Dictionary<string, List<Point>> dictionary, string tortowyZascianekKey)
         {
             var max = dictionary[tortowyZascianekKey].Count;
             var howManyPointShouldStay = 50;
             var takeEveryNthPoint = max / howManyPointShouldStay;
+            takeEveryNthPoint = takeEveryNthPoint == 0
+                ? 1
+                : takeEveryNthPoint;
             Console.WriteLine(DateTimeOffset.UtcNow + " there are " + max + " point, I will take every " + takeEveryNthPoint + "nth for the chart");
 
             foreach (var key in dictionary.Keys.ToArray())
