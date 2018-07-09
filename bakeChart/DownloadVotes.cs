@@ -8,7 +8,14 @@ namespace bakeChart
 {
     class DownloadVotes
     {
-        public static void DownloadVotes_Parse_SaveToFile()
+        private static string _url;
+
+        public DownloadVotes(string url)
+        {
+            _url = url;
+        }
+
+        public void DownloadVotes_Parse_SaveToFile()
         {
             Console.WriteLine(DateTimeOffset.UtcNow + ": will now download data");
             var result = Download();
@@ -17,19 +24,11 @@ namespace bakeChart
             Console.WriteLine(DateTimeOffset.UtcNow + ": data written to: " + fullFileName);
         }
 
-        private static string SaveToFile(string resultParsed)
+        private string Download()
         {
-            var now = DateTimeOffset.UtcNow;
-            var fileName = now.ToString("yyyy-MM-ddTHH-mm-ss") + ".txt";
-            var outputDirecotry = Path.Combine("outs",
-                now.Year.ToString("0000"),
-                now.Month.ToString("00"),
-                now.Day.ToString("00"),
-                now.Hour.ToString("00"));
-            Directory.CreateDirectory(outputDirecotry);
-            var fullFileName = Path.Combine(outputDirecotry, fileName);
-            File.WriteAllText(fullFileName, resultParsed);
-            return fullFileName;
+            var httpClient = new HttpClient();
+            var result = httpClient.GetStringAsync(_url).Result;
+            return result;
         }
 
         private static string Parse(string result)
@@ -51,12 +50,19 @@ namespace bakeChart
             return stringBuilder.ToString();
         }
 
-        private static string Download()
+        private string SaveToFile(string resultParsed)
         {
-            var httpClient = new HttpClient();
-            var result = httpClient
-                .GetStringAsync("http://hermes.gratka-technologie.pl/glosowanie/wyniki/66482,37218,id,idg.html").Result;
-            return result;
+            var now = DateTimeOffset.UtcNow;
+            var fileName = now.ToString("yyyy-MM-ddTHH-mm-ss") + ".txt";
+            var outputDirecotry = Path.Combine("outs",
+                now.Year.ToString("0000"),
+                now.Month.ToString("00"),
+                now.Day.ToString("00"),
+                now.Hour.ToString("00"));
+            Directory.CreateDirectory(outputDirecotry);
+            var fullFileName = Path.Combine(outputDirecotry, fileName);
+            File.WriteAllText(fullFileName, resultParsed);
+            return fullFileName;
         }
     }
 }

@@ -16,7 +16,8 @@ namespace bakeChart
         {
             try
             {
-                DownloadVotes.DownloadVotes_Parse_SaveToFile();
+                var x = new DownloadVotes("http://hermes.gratka-technologie.pl/glosowanie/wyniki/66482,37218,id,idg.html");
+                x.DownloadVotes_Parse_SaveToFile();
             }
             catch (Exception e)
             {
