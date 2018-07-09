@@ -54,7 +54,7 @@ namespace bakeChart.Charting
 
             if (File.Exists(@"C:\inetpub\wwwroot\out.html"))
             {
-                File.Copy("wejherowski.html", @"C:\inetpub\wwwroot\out.html");
+                File.Copy("wejherowski.html", @"C:\inetpub\wwwroot\out.html", true);
             }
 
             var bestCompetitorsFromAreas = allPoints
@@ -66,8 +66,23 @@ namespace bakeChart.Charting
                         .Select(x => new {Competitor = x.Key, MaxVotes = x.Max(y => y.Value)})
                         .OrderBy(x => x.MaxVotes)
                         .Last();
-                    return bestCompetitorFromThisArea;
+                    return bestCompetitorFromThisArea.Competitor;
                 });
+
+            var bestOfAllDic = allPoints
+                .GroupBy(x => x.CompetitorName)
+                .Where(x => bestCompetitorsFromAreas.Contains(x.Key))
+                .ToDictionary(x => x.Key, x => x.ToList());
+
+            AddMissingPoints(bestOfAllDic, tortowyZascianekKey);
+            OrderPointsByDateTime(bestOfAllDic);
+            Only50PointsShallRemainForEachCompetitor(bestOfAllDic, tortowyZascianekKey);
+            DoChart(bestOfAllDic, tortowyZascianekKey, "best");
+
+            if (File.Exists(@"C:\inetpub\wwwroot\out.html"))
+            {
+                File.Copy("best.html", @"C:\inetpub\wwwroot\best.html", true);
+            }
         }
 
         private static void Only50PointsShallRemainForEachCompetitor(Dictionary<string, List<Point>> dictionary, string tortowyZascianekKey)

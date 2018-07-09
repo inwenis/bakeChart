@@ -10,8 +10,8 @@ namespace bakeChart
     {
         static void Main(string[] args)
         {
-//            var timer = new Timer(new TimerCallback(DownloadAndSaveData), null, 0, 10 * 60 * 1000);
-            var timer = new Timer(new TimerCallback(DownloadAndSaveData), null, 0, 10 * 1000);
+            var timer = new Timer(new TimerCallback(DownloadAndSaveData), null, 0, 10 * 60 * 1000);
+//            var timer = new Timer(new TimerCallback(DownloadAndSaveData), null, 0, 10 * 1000);
             Console.WriteLine("Press [enter] to exit");
             Console.ReadLine();
         }
@@ -38,6 +38,7 @@ namespace bakeChart
                 };
 
                 var results = urls
+                    .AsParallel()
                     .Select(x => new DownloadVotes(x))
                     .Select(x => x.DownloadVotes_Parse());
                 var allResults = string.Join("", results);
