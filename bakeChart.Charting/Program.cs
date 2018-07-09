@@ -12,7 +12,6 @@ namespace bakeChart.Charting
     {
         static Random random = new Random(((int) DateTimeOffset.UtcNow.Ticks));
 
-
         static void Main(string[] args)
         {
             var timer = new Timer(new TimerCallback(RefreshChart), null, 0, 10 * 60 * 1000);
@@ -23,59 +22,101 @@ namespace bakeChart.Charting
         static void RefreshChart(object state)
         {
             Console.WriteLine(DateTimeOffset.UtcNow + " will now refresh chart");
-            var dictionary = ReadDataFromFiles(@"c:\git\bakeChart\bakeChart\bin\Debug\outs");
+            var allPoints = ReadDataFromFiles(@"c:\git\bakeChart\bakeChart\bin\Debug\outs");
+
+            Dictionary<string, List<Point>> dictionary = allPoints
+                .GroupBy(x => x.CompetitorName)
+                .ToDictionary(x => x.Key, x => x.ToList());
 
             RemoveEntreisWhereAllValuesAreZero(dictionary);
 
-            var keys = dictionary.Keys.ToArray();
+            var allPointsWithOutLoosers = dictionary.SelectMany(x => x.Value);
 
-            foreach (var key in keys)
+            var areaName_Competitor_Points = new Dictionary<string, Dictionary<string, List<Point>>>();
+
+            var grouppedByArea = allPointsWithOutLoosers
+                .GroupBy(x => x.AreaName);
+
+            foreach (var areaGroup in grouppedByArea)
             {
-                dictionary[key] = dictionary[key].OrderBy(x => x.DateTime).ToList();
+                var dic = areaGroup
+                    .GroupBy(x => x.CompetitorName)
+                    .ToDictionary(y => y.Key, y => y.ToList());
+                areaName_Competitor_Points.Add(areaGroup.Key, dic);
             }
 
-            var tortowyZascianekKey = keys.First(k => k.Contains("Tortowy"));
-            AddMissingPoints(dictionary, tortowyZascianekKey);
+            var powWejherowskiDic = areaName_Competitor_Points["Mistrzowie Smaku - Cukiernia/Kawiarnia Roku 2018 (powiat wejherowski)"];
+            var tortowyZascianekKey = "Tortowy Zaścianek Bogna Nadolska, Bojano, ul. Czynu 1000-lecia 8";
+            AddMissingPoints(powWejherowskiDic, tortowyZascianekKey);
+            OrderPointsByDateTime(powWejherowskiDic);
+            Only50PointsShallRemainForEachCompetitor(powWejherowskiDic, tortowyZascianekKey);
+            DoChart(powWejherowskiDic, tortowyZascianekKey, "wejherowski");
 
+            if (File.Exists(@"C:\inetpub\wwwroot\out.html"))
+            {
+                File.Copy("wejherowski.html", @"C:\inetpub\wwwroot\out.html");
+            }
+
+            var bestCompetitorsFromAreas = allPoints
+                .GroupBy(x => x.AreaName)
+                .Select(areaGroup =>
+                {
+                    var groupByComp = areaGroup.GroupBy(x => x.CompetitorName);
+                    var bestCompetitorFromThisArea = groupByComp
+                        .Select(x => new {Competitor = x.Key, MaxVotes = x.Max(y => y.Value)})
+                        .OrderBy(x => x.MaxVotes)
+                        .Last();
+                    return bestCompetitorFromThisArea;
+                });
+        }
+
+        private static void Only50PointsShallRemainForEachCompetitor(Dictionary<string, List<Point>> dictionary, string tortowyZascianekKey)
+        {
             var max = dictionary[tortowyZascianekKey].Count;
-            var howManyPointShouldStay = 50;
+            var howManyPointShouldStay = 20;
             var takeEveryNthPoint = max / howManyPointShouldStay;
             Console.WriteLine(DateTimeOffset.UtcNow + " there are " + max + " point, I will take every " + takeEveryNthPoint + "nth for the chart");
 
-            foreach (var key in keys)
+            foreach (var key in dictionary.Keys.ToArray())
             {
-                //take every 4th entry
                 int c = 0;
-                var allPoints = dictionary[key];
-                var pointsToPlotOnChart = allPoints.Where(x => c++ % takeEveryNthPoint == 0).ToList();
-                if (!pointsToPlotOnChart.Contains(allPoints.Last()))
+                var allPointsForKey = dictionary[key];
+                var pointsToPlotOnChart = allPointsForKey.Where(x => c++ % takeEveryNthPoint == 0).ToList();
+                //add last point
+                if (!pointsToPlotOnChart.Contains(allPointsForKey.Last()))
                 {
-                    pointsToPlotOnChart.Add(allPoints.Last());
+                    pointsToPlotOnChart.Add(allPointsForKey.Last());
                 }
+
                 dictionary[key] = pointsToPlotOnChart;
             }
+        }
 
+        private static void DoChart(Dictionary<string, List<Point>> dictionary, string tortowyZascianekKey, string s)
+        {
             var labels = dictionary[tortowyZascianekKey]
-                .Select(x => "'" + x.DateTime.ToOffset(TimeSpan.FromHours(2)).ToString("dd MMM  HH:mm", new CultureInfo("pl-PL")) + "'")
-                .Aggregate((a,b) => a + "," + b);
+                .Select(x =>"'" + x.DateTime.ToOffset(TimeSpan.FromHours(2)).ToString("dd MMM  HH:mm", new CultureInfo("pl-PL")) + "'")
+                .Aggregate((a, b) => a + "," + b);
 
-            var allDataSetsJoined = dictionary.Select(x => DatasetForCompetitor(x.Key, x.Value)).Aggregate((a, b) => a + "\n" + b);
+            var allDataSetsJoined = dictionary
+                .Select(x => DatasetForCompetitor(x.Key, x.Value))
+                .Aggregate((a, b) => a + "\n" + b);
             var allText = File.ReadAllText("chartTemplate.html");
             var replace = allText
                 .Replace("XXXLabelsXXX", labels)
                 .Replace("XXXDataSetsXXX", allDataSetsJoined);
-
-            try
-            {
-                File.WriteAllText(@"out.html", replace, Encoding.UTF8);
-                File.WriteAllText(@"C:\inetpub\wwwroot\out.html", replace, Encoding.UTF8);
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Cout not write to one of the output files");
-            }
-
+            File.WriteAllText(s + ".html", replace, Encoding.UTF8);
             Console.WriteLine(DateTimeOffset.UtcNow + " done refreshing chart");
+        }
+
+        private static void OrderPointsByDateTime(Dictionary<string, List<Point>> dictionary)
+        {
+            var keys = dictionary.Keys.ToArray();
+            
+            foreach (var key in keys)
+            {
+                dictionary[key] = dictionary[key].OrderBy(x => x.DateTime).ToList();
+            }
         }
 
         private static void RemoveEntreisWhereAllValuesAreZero(Dictionary<string, List<Point>> dictionary)
@@ -137,9 +178,9 @@ namespace bakeChart.Charting
             return sb.ToString();
         }
 
-        private static Dictionary<string, List<Point>> ReadDataFromFiles(string pathToDirectoryWithFiles)
+        private static List<Point> ReadDataFromFiles(string pathToDirectoryWithFiles)
         {
-            var dictionary = new Dictionary<string, List<Point>>();
+            var allPoints = new List<Point>();
             var files = Directory.GetFiles(pathToDirectoryWithFiles, "*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
@@ -153,23 +194,27 @@ namespace bakeChart.Charting
                 {
                     var splitted = line.Split('\t');
                     var competitorName = splitted[0];
-                    var value = int.Parse(splitted[1]);
-                    if (!dictionary.ContainsKey(competitorName))
+                    var areaName = splitted[1];
+                    var value = int.Parse(splitted[2]);
+                    allPoints.Add(new Point
                     {
-                        dictionary.Add(competitorName, new List<Point>());
-                    }
-
-                    dictionary[competitorName].Add(new Point {DateTime = dateTimeFromFileName, Value = value});
+                        DateTime = dateTimeFromFileName,
+                        AreaName = areaName,
+                        CompetitorName = competitorName,
+                        Value = value
+                    });
                 }
             }
 
-            return dictionary;
+            return allPoints;
         }
     }
 
     internal class Point
     {
         public DateTimeOffset DateTime { get; set; }
+        public string AreaName { get; set; }
+        public string CompetitorName { get; set; }
         public int Value { get; set; }
     }
 }
