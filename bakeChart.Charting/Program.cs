@@ -74,7 +74,7 @@ namespace bakeChart.Charting
                 .Where(x => bestCompetitorsFromAreas.Contains(x.Key))
                 .ToDictionary(x => x.Key, x => x.ToList());
 
-            UseOnlyPointsNewerThan(bestOfAllDic, new DateTimeOffset(2018, 07, 09, 15, 0, 0, TimeSpan.Zero));
+            UseOnlyPointsNewerThan(bestOfAllDic, new DateTimeOffset(2018, 07, 09, 21, 40, 0, TimeSpan.Zero));
             AddMissingPoints(bestOfAllDic, tortowyZascianekKey);
             OrderPointsByDateTime(bestOfAllDic);
             Only50PointsShallRemainForEachCompetitor(bestOfAllDic, tortowyZascianekKey);
