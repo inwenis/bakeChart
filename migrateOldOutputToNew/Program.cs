@@ -21,11 +21,11 @@ namespace migrateOldOutputToNew
                        datetimeFromFileName.Day.ToString();
             });
 
-            foreach (var groupByDay in groupsByDay.OrderBy(x => x.Key).Skip(1).Reverse().Skip(1).Where(x => x.Count() > 144))
+            foreach (var groupByDay in groupsByDay.OrderBy(x => x.Key).Take(1))
             {
                 Console.WriteLine(groupByDay.Key);
                 Console.WriteLine("groupByDay.Count() = " + groupByDay.Count());
-                var takeEventNth = groupByDay.Count() / (24 * 6);
+                var takeEventNth = 10;
                 var index = 0;
                 var enumerable = groupByDay.Select(x =>
                     {
