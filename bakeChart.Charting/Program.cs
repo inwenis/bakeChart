@@ -30,7 +30,7 @@ namespace bakeChart.Charting
 
             RemoveEntreisWhereAllValuesAreZero(dictionary);
 
-            var allPointsWithOutLoosers = dictionary.SelectMany(x => x.Value);
+            var allPointsWithOutLoosers = dictionary.SelectMany(x => x.Value); // a looser is someone with 0 votes
 
             var areaName_Competitor_Points = new Dictionary<string, Dictionary<string, List<Point>>>();
 
