@@ -50,7 +50,7 @@ namespace bakeChart.Charting
             AddMissingPoints(powWejherowskiDic, tortowyZascianekKey);
             OrderPointsByDateTime(powWejherowskiDic);
             Only50PointsShallRemainForEachCompetitor(powWejherowskiDic, tortowyZascianekKey);
-            DoChart(powWejherowskiDic, tortowyZascianekKey, "wejherowski");
+            DoChart(powWejherowskiDic, tortowyZascianekKey, "wejherowski.html");
 
             if (File.Exists(@"C:\inetpub\wwwroot\out.html"))
             {
@@ -78,7 +78,7 @@ namespace bakeChart.Charting
             AddMissingPoints(bestOfAllDic, tortowyZascianekKey);
             OrderPointsByDateTime(bestOfAllDic);
             Only50PointsShallRemainForEachCompetitor(bestOfAllDic, tortowyZascianekKey);
-            DoChart(bestOfAllDic, tortowyZascianekKey, "best");
+            DoChart(bestOfAllDic, tortowyZascianekKey, "best.html");
 
             if (File.Exists(@"C:\inetpub\wwwroot\out.html"))
             {
@@ -119,20 +119,21 @@ namespace bakeChart.Charting
             }
         }
 
-        private static void DoChart(Dictionary<string, List<Point>> dictionary, string tortowyZascianekKey, string s)
+        private static void DoChart(Dictionary<string, List<Point>> dictionary, string tortowyZascianekKey, string outputFileName)
         {
             var labels = dictionary[tortowyZascianekKey]
                 .Select(x =>"'" + x.DateTime.ToOffset(TimeSpan.FromHours(2)).ToString("dd MMM  HH:mm", new CultureInfo("pl-PL")) + "'")
                 .Aggregate((a, b) => a + "," + b);
 
             var allDataSetsJoined = dictionary
+                .OrderByDescending(x => x.Value.Max(point => point.Value))
                 .Select(x => DatasetForCompetitor(x.Key, x.Value))
                 .Aggregate((a, b) => a + "\n" + b);
             var allText = File.ReadAllText("chartTemplate.html");
             var replace = allText
                 .Replace("XXXLabelsXXX", labels)
                 .Replace("XXXDataSetsXXX", allDataSetsJoined);
-            File.WriteAllText(s + ".html", replace, Encoding.UTF8);
+            File.WriteAllText(outputFileName, replace, Encoding.UTF8);
             Console.WriteLine(DateTimeOffset.UtcNow + " done refreshing chart");
         }
 
