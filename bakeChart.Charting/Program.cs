@@ -22,7 +22,7 @@ namespace bakeChart.Charting
         static void RefreshChart(object state)
         {
             Console.WriteLine(DateTimeOffset.UtcNow + " will now refresh chart");
-            var allPoints = ReadDataFromFiles(@"c:\git\bakeChart\bakeChart\bin\Debug\outs");
+            var allPoints = ReadDataFromFiles(@"C:/bakeChartData");
 
             Dictionary<string, List<Point>> dictionary = allPoints
                 .GroupBy(x => x.CompetitorName)

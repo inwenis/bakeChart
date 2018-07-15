@@ -8,6 +8,8 @@ namespace bakeChart
 {
     class Program
     {
+        private static string _rootOutputDirectory = "C:/bakeChartData";
+
         static void Main(string[] args)
         {
             var timer = new Timer(new TimerCallback(DownloadAndSaveData), null, 0, 10 * 60 * 1000);
@@ -42,7 +44,7 @@ namespace bakeChart
                     .Select(x => new DownloadVotes(x))
                     .Select(x => x.DownloadVotes_Parse());
                 var allResults = string.Join("", results);
-                var fullFileName = SaveToFile(allResults);
+                var fullFileName = SaveToFile(allResults, _rootOutputDirectory);
                 Console.WriteLine(DateTimeOffset.UtcNow + ": data written to: " + fullFileName);
             }
             catch (Exception e)
@@ -51,7 +53,7 @@ namespace bakeChart
             }
         }
 
-        private static string SaveToFile(string resultParsed)
+        private static string SaveToFile(string resultParsed, string rootOutputdirecotry)
         {
             var now = DateTimeOffset.UtcNow;
             var fileName = now.ToString("yyyy-MM-ddTHH-mm-ss") + ".txt";
@@ -61,7 +63,7 @@ namespace bakeChart
                 now.Day.ToString("00"),
                 now.Hour.ToString("00"));
             Directory.CreateDirectory(outputDirecotry);
-            var fullFileName = Path.Combine(outputDirecotry, fileName);
+            var fullFileName = Path.Combine(rootOutputdirecotry, outputDirecotry, fileName);
             File.WriteAllText(fullFileName, resultParsed);
             return fullFileName;
         }
