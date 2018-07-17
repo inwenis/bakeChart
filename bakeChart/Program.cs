@@ -57,13 +57,15 @@ namespace bakeChart
         {
             var now = DateTimeOffset.UtcNow;
             var fileName = now.ToString("yyyy-MM-ddTHH-mm-ss") + ".txt";
-            var outputDirecotry = Path.Combine("outs",
+            var outputDirecotry = Path.Combine(
+                rootOutputdirecotry,
+                "outs",
                 now.Year.ToString("0000"),
                 now.Month.ToString("00"),
                 now.Day.ToString("00"),
                 now.Hour.ToString("00"));
             Directory.CreateDirectory(outputDirecotry);
-            var fullFileName = Path.Combine(rootOutputdirecotry, outputDirecotry, fileName);
+            var fullFileName = Path.Combine(outputDirecotry, fileName);
             File.WriteAllText(fullFileName, resultParsed);
             return fullFileName;
         }
