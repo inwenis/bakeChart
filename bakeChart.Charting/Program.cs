@@ -57,6 +57,35 @@ namespace bakeChart.Charting
                 File.Copy("wejherowski.html", @"C:\inetpub\wwwroot\out.html", true);
             }
 
+            foreach (var areaNameCompetitorPoint in areaName_Competitor_Points)
+            {
+                try
+                {
+                    var justSomeKey = areaNameCompetitorPoint.Value.First().Key;
+                    var dic = areaNameCompetitorPoint.Value;
+                    AddMissingPoints(dic, justSomeKey);
+                    OrderPointsByDateTime(dic);
+                    Only50PointsShallRemainForEachCompetitor(dic, justSomeKey);
+                    var fileName = areaNameCompetitorPoint.Key
+                        .Substring(areaNameCompetitorPoint.Key.IndexOf("("))
+                        .Replace(" ", "")
+                        .Replace("(", "")
+                        .Replace(")", "")
+                        .Replace("/", "")
+                        .Replace("-", "");
+                    var outputFileName = fileName + ".html";
+                    DoChart(dic, justSomeKey, outputFileName);
+                    if (File.Exists(@"C:\inetpub\wwwroot\out.html"))
+                    {
+                        File.Copy(outputFileName, @"C:\inetpub\wwwroot\" + outputFileName, true);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+
             var bestCompetitorsFromAreas = allPoints
                 .GroupBy(x => x.AreaName)
                 .Select(areaGroup =>
