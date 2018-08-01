@@ -194,7 +194,7 @@ namespace bakeChart.Charting
 
             var sb = new StringBuilder();
             sb.AppendLine("{");
-            sb.AppendLine("label: '" + name.Substring(0, name.IndexOf(',')) + "',");
+            sb.AppendLine("label: \"" + name.Substring(0, name.IndexOf(',')) + "\",");
             sb.AppendLine("backgroundColor: window.chartColors." + colorName + ",");
             sb.AppendLine("borderColor: window.chartColors." + colorName + ",");
             sb.AppendLine("data: [");
